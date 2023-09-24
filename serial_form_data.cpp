@@ -21,23 +21,25 @@ using namespace std;
 
 
 int sendPacket(int fd,char *data,int size){
-
-
-
-
     write(fd,"@",1);
 
     write(fd,data,size);
-
-
-
     write(fd,"$",1);
 
     return 1;
-
-
-
 }
+
+
+int sendPacket_zh(int fd,const char *data,int size){
+    write(fd,"%",1);
+
+    write(fd,data,size);
+    write(fd,"$",1);
+
+    return 1;
+}
+
+
 int receivePacket(int fd,char *data, int size){
 
     fcntl(fd,F_SETFL,FNDELAY);
