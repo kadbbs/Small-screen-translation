@@ -15,6 +15,10 @@
 #include <string>
 using namespace std;
 
+//定义两个信号用于内容改变的触发
+
+#define MYSIG_TRAN (_SIGRTMIN + 10)
+#define MYSIG_YUAN (_SIGRTMIN + 11)
 
 
 int open_port(void){
@@ -32,10 +36,23 @@ int open_port(void){
 
 }
 
+void my_str_ncp(char *str1,char *str2,int len){
+
+    for(int i=0;i<len;i++){
+
+        str2[i] = str1[i];
+
+
+    }
+
+}
 
 char word_buf[30];
+char word_buf_r[30];
+
 string tmp_word_str="^";
 char word_chinse[100];
+//char word_chinse_r[100];
 void * get_word(void *arg){
 
     int fd=open("selection.txt",O_RDWR);
@@ -44,13 +61,21 @@ void * get_word(void *arg){
         memset(word_buf,0,30);
         memset(word_chinse,0,100);
         int len=read(fd,word_buf,30);
-        int len_zh=read(fd_zh,word_chinse,100);
+        if(strcmp(word_buf,word_buf_r)!=0){
+
+            system("python connext_api.py");
+            cout<<"python is called"<<endl;
+            cout<<"two str"<<word_buf<<":"<<word_buf_r<<endl;
+            int len_zh=read(fd_zh,word_chinse,100);
+            lseek(fd_zh,0,SEEK_SET);
+            //memcpy(word_buf,word_buf_r,30);
+            my_str_ncp(word_buf,word_buf_r,30);
+        }
         // string tmp_word_str=word_buf;
         lseek(fd,0,SEEK_SET);
-        lseek(fd_zh,0,SEEK_SET);
 
-        cout<<"fd_word= "<<word_buf<<endl;
-        cout<<"tmp_word_str"<<tmp_word_str<<endl;
+        // cout<<"fd_word= "<<word_buf<<endl;
+        // cout<<"tmp_word_str"<<tmp_word_str<<endl;
         if(len<0){
 
             perror("get_word read!");
@@ -73,7 +98,7 @@ void *select_xclip(void *arg){
     while(1){
 
         system("/usr/bin/xclip -o > selection.txt");
-        system("python connext_api.py");
+        
         sleep(1);
     }
     return NULL;
@@ -83,15 +108,16 @@ void *select_xclip(void *arg){
 
 int main (int argc, char *argv[])
 {
-   
+    word_buf_r[0]='&';
     std::cout<<word_buf<<std::endl;
    //得到word
     pthread_t pd[10];
 
     pthread_create(&pd[1], NULL, get_word, NULL);
     pthread_create(&pd[0],NULL,select_xclip,NULL);
-    //get_word(fd_word;word_buf,sizeof(word_buf));
-    std::cout<<"get word is"<<word_buf<<std::endl;
+    
+    
+    //std::cout<<"get word is"<<word_buf<<std::endl;
    //打开串口
     int fd=open_port();
     //设置serial参数
@@ -103,6 +129,7 @@ int main (int argc, char *argv[])
         cout<<"sendPacket doing"<<endl;
         sendPacket(fd,word_buf, strlen(word_buf));
         sendPacket_zh(fd,word_chinse, strlen(word_chinse));
+        cout<<"chinese"<<word_chinse<<endl;
         sleep(3);
     }
     close(fd);
