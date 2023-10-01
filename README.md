@@ -1,11 +1,11 @@
-项目概述：
-    1、复制或者划取单词或句子，会在终端上显示，并通过串口发送给数据
-    2、串口数据格式为可变长 （ch32v307的部分源码在目录ch32中）
-        英文   @data$ 
-        中文   %data$
+Project Overview:
+    1, copy or scratch the word or sentence, will be displayed on the terminal, and send data through the serial port
+    2、Serial port data format is variable length (ch32v307 part of the source code in the catalog ch32)
+        English @data$ 
+        Chinese %data$
 
-网易api的ID和KEY在py文件中更换
+The ID and KEY of the Netease api are replaced in the py file.
 
-command:
+command.
     make
     ./main
