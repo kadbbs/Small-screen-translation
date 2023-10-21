@@ -31,10 +31,10 @@ int sendPacket(int fd,char *data,int size){
 
 
 int sendPacket_zh(int fd,const char *data,int size){
-    write(fd,"%",1);
+    write(fd,"$",1);
 
     write(fd,data,size);
-    write(fd,"$",1);
+    write(fd,"%",1);
 
     return 1;
 }

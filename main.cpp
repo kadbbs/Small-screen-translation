@@ -13,6 +13,7 @@
 #include "set_serial.h"
 #include <signal.h>   
 #include <string>
+#include "font_trans.h"
 using namespace std;
 
 //定义两个信号用于内容改变的触发
@@ -58,8 +59,13 @@ void my_str_ncp(char *str1,char *str2,int len){
 void send_data(int sig,siginfo_t *info,void *data){
 
         cout<<"sendPacket doing"<<endl;
+        char gbk[100]={0};
+        Utf8ToGbk(word_chinse,strlen(word_chinse),gbk,sizeof(gbk));
+        cout<<"gbk:"<<gbk<<endl;
         sendPacket(info->si_int,word_buf, strlen(word_buf));
-        sendPacket_zh(info->si_int,word_chinse, strlen(word_chinse));
+        cout<<"send zhing"<<endl;
+        sendPacket_zh(info->si_int,gbk, strlen(gbk));
+        cout<<"zh en"<<endl;
 
 }
 
@@ -73,12 +79,16 @@ void * get_word(void *arg){
         memset(word_buf,0,30);
         memset(word_chinse,0,100);
         int len=read(fd,word_buf,30);
+        
+
         if(strcmp(word_buf,word_buf_r)!=0){
 
             system("python connext_api.py");
             cout<<"python is called"<<endl;
             cout<<"two str"<<word_buf<<":"<<word_buf_r<<endl;
             int len_zh=read(fd_zh,word_chinse,100);
+            cout<<"len_zh"<<len_zh<<endl;
+            word_chinse[len_zh-1]='\0';
 
             lseek(fd_zh,0,SEEK_SET);
             
@@ -99,7 +109,7 @@ void * get_word(void *arg){
 
         }
 
-        sleep(3);
+        sleep(1);
 
     }
 

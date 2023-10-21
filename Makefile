@@ -2,7 +2,7 @@ SRCS:=$(shell find ./* -type f |grep "\.cpp")
 
 INCLUDE=.
 
-main: main.o  set_serial.o serial_form_data.o 
+main: main.o  set_serial.o serial_form_data.o font_trans.o
 	g++ -I${INCLUDE} $^ -o main -lpthread -g 
 %.o:%.cpp
 	g++ -c $^ -o $@
